@@ -4,10 +4,11 @@ LABEL application=microtrader
 LABEL mytest=true
 
 # Install system dependencies
-RUN apk add --update --no-cache bash curl
+RUN echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
+    apk add --update --no-cache bash curl confd@testing
 
 # Create vertx user
-RUN mkdir /app && \
+RUN mkdir -p /app/conf && \
     addgroup -g 1000 vertx && \
     adduser -u 1000 -G vertx -D vertx && \
     chown -R vertx:vertx /app && \
@@ -18,7 +19,7 @@ USER vertx
 WORKDIR /app
 
 # Set entrypoint and default command arguments
-COPY cluster.xml /app/conf/cluster.xml
+COPY etc/confd /etc/confd
 COPY entrypoint.sh /app/entrypoint.sh
 USER root
 RUN chmod -R 777 /app
